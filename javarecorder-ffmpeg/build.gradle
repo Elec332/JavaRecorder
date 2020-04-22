@@ -1,0 +1,77 @@
+archivesBaseName = "JavaRecorder-FFmpeg"
+
+sourceSets {
+    all
+}
+
+sourceSets.all.java {
+    srcDirs sourceSets.main.allJava
+}
+
+dependencies {
+    compile project(":javarecorder")
+    mavenPom project.group + ":javarecorder:" + project.version
+
+    compile "org.bytedeco:ffmpeg:4.2.1-1.5.2"
+    compileOnly ('org.bytedeco:javacv:1.5.2') {
+        exclude module: "javacpp"
+        exclude module: "ffmpeg"
+    }
+
+    allCompile "org.bytedeco:ffmpeg-platform:4.2.1-1.5.2"
+
+    compile fileTree(dir: "javafx", include: "*.jar")
+}
+
+task checkAllJar {
+    doFirst {
+        FileCollection sources = compileAllJava.getSource().filter({f -> !f.getName().equals("module-info.java")})
+        project.copy {
+            from(sourceSets.main.allJava) {
+                include("module-info.java")
+            }
+            into("build/generated")
+            filter {
+                line -> line.replaceAll("org.bytedeco.ffmpeg", "org.bytedeco.ffmpeg.platform; requires transitive org.bytedeco.ffmpeg")
+            }
+        }
+        sources = sources.plus(project.files("build/generated/module-info.java"))
+        println sources
+        compileAllJava.setSource(sources)
+    }
+}
+
+compileAllJava {
+    dependsOn(checkAllJar)
+    doFirst {
+        List<String> compilerArgsAll = new ArrayList<>(compileAllJava.options.getAllCompilerArgs())
+        int i = compilerArgsAll.indexOf("--module-path")
+        compilerArgsAll.remove(i + 1)
+        compilerArgsAll.remove(i)
+        compilerArgsAll.add("--module-path")
+        compilerArgsAll.add(configurations.allCompile.getAsPath() + ";" + configurations.compile.getAsPath() + ";" + configurations.compileOnly.getAsPath())
+        compileAllJava.options.setCompilerArgs(compilerArgsAll)
+    }
+}
+
+task allJar (type: Jar, dependsOn: [shadowJar, compileAllJava]) {
+    classifier "all"
+    from (zipTree(shadowJar.archivePath)) {
+        exclude "module-info.*"
+    }
+    from(sourceSets.all.output) {
+        include("module-info.*")
+    }
+}
+
+artifacts {
+    archives allJar
+}
+
+shadowJar {
+    relocate "org.bytedeco.javacv", "jrec.embed.org.bytedeco.javacv"
+}
+
+ossrh {
+    addProjectDependencies = false
+}

@@ -1,0 +1,10 @@
+archivesBaseName = "JavaRecorder"
+
+dependencies {
+    compile "nl.elec332.util:implementationmanager:1.0.2-Beta"
+    compileOnly 'org.jcodec:jcodec:0.2.5'
+}
+
+shadowJar {
+    relocate "org.jcodec", "jla.embed.org.jcodec"
+}
