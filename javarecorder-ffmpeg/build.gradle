@@ -10,7 +10,6 @@ sourceSets.all.java {
 
 dependencies {
     compile project(":javarecorder")
-    mavenPom project.group + ":javarecorder:" + project.version
 
     compile "org.bytedeco:ffmpeg:4.2.1-1.5.2"
     compileOnly ('org.bytedeco:javacv:1.5.2') {
@@ -70,8 +69,4 @@ artifacts {
 
 shadowJar {
     relocate "org.bytedeco.javacv", "jrec.embed.org.bytedeco.javacv"
-}
-
-ossrh {
-    addProjectDependencies = false
 }

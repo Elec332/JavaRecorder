@@ -14,7 +14,7 @@ subprojects {
     apply plugin: "com.dua3.gradle.jpms"
 
     group 'nl.elec332.util'
-    version '0.1-Alpha'
+    version '0.1-Alpha-test'
 
     sourceCompatibility = targetCompatibility = 1.11
 
@@ -39,11 +39,11 @@ subprojects {
         githubUrl = 'https://github.com/Elec332/JavaRecorder'
 
         license {
-            name 'GNU Lesser General Public License, version 2.1'
-            url 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt'
+            name = 'GNU Lesser General Public License, version 2.1'
+            url = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt'
         }
         developer {
-            name 'Elec332'
+            name = 'Elec332'
         }
     }
 
